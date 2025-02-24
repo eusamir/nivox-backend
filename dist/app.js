@@ -46,6 +46,8 @@ const queues_1 = require("./queues");
 const queue_1 = __importDefault(require("./libs/queue"));
 const bull_board_1 = __importDefault(require("bull-board"));
 const basic_auth_1 = __importDefault(require("basic-auth"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const swagger_output_json_1 = __importDefault(require("../src/config/swagger-output.json"));
 // Função de middleware para autenticação básica
 const isBullAuth = (req, res, next) => {
     const user = (0, basic_auth_1.default)(req);
@@ -61,6 +63,7 @@ exports.isBullAuth = isBullAuth;
 // Inicializar Sentry
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 const app = (0, express_1.default)();
+app.use('/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_output_json_1.default));
 // Configuração de filas
 app.set("queues", {
     messageQueue: queues_1.messageQueue,
@@ -95,7 +98,7 @@ app.use(body_parser_1.default.json({ limit: '5mb' })); // Aumentar o limite de c
 app.use(body_parser_1.default.urlencoded({ limit: '5mb', extended: true }));
 app.use((0, cors_1.default)({
     credentials: true,
-    origin: '*'
+    origin: allowedOrigins
 }));
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());

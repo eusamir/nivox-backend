@@ -19,6 +19,8 @@ import { messageQueue, sendScheduledMessages } from "./queues";
 import BullQueue from "./libs/queue"
 import BullBoard from 'bull-board';
 import basicAuth from 'basic-auth';
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from '../src/config/swagger-output.json';
 
 // Função de middleware para autenticação básica
 export const isBullAuth = (req, res, next) => {
@@ -38,6 +40,8 @@ dotenvConfig();
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 
 const app = express();
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Configuração de filas
 app.set("queues", {
@@ -78,7 +82,7 @@ app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 app.use(
   cors({
     credentials: true,
-    origin: '*'
+    origin: allowedOrigins
   })
 );
 app.use(cookieParser());
